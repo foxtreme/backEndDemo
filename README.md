@@ -1,4 +1,12 @@
-# Notes:
+<h1>Flask backend</h1>
+<p>
+There are 2 models here: Purchase and Loan, a loan has 0 or more purchases 
+and a purchase is associated to a single loan. <br>
+When consulting purchases you will need to pass the loan_id field in the request.
+ Additionally the update methods run through the request json to update only the 
+ attributes passed.
+</p>
+<h2> Notes: </h2>
 
 <em>Required libraries and versions:</em> 
 <ul>
