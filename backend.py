@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import os
 
-SQLALCHEMY_TRACK_MODIFICATIONS = True
+# Config
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'crud.sqlite')
@@ -11,6 +11,7 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 
+# Models
 class Loan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     total = db.Column(db.Float, nullable=False)
@@ -24,6 +25,7 @@ class Purchase(db.Model):
     loan = db.relationship('Loan', backref='purchases')
 
 
+# Schemas
 class LoanSchema(ma.ModelSchema):
     class Meta:
         model = Loan
@@ -42,7 +44,8 @@ purchase_schema = PurchaseSchema()
 purchases_schema = PurchaseSchema(many=True)
 
 
-# endpoints
+# Endpoints
+# Loan
 @app.route("/loan", methods=["POST"])
 def add_loan():
     total = request.json['total']
@@ -69,9 +72,10 @@ def detail_loan(id):
 
 @app.route("/loan/<id>", methods=["PUT"])
 def update_loan(id):
-    total = request.json['total']
     loan = Loan.query.get(id)
-    loan.total = total
+    req_json = request.get_json()
+    for k, v in req_json.items():
+        setattr(loan, k, v)
     db.session.commit()
     result = loan_schema.dump(loan).data
     return jsonify({"loan": result})
@@ -86,6 +90,7 @@ def delete_loan(id):
     return jsonify({"loan": result})
 
 
+# Purchase
 @app.route("/purchase", methods=["POST"])
 def add_purchase():
     investor_name = request.json['investor_name']
@@ -117,11 +122,9 @@ def detail_purchase(id):
 @app.route("/purchase/<id>", methods=["PUT"])
 def update_purchase(id):
     purchase = Purchase.query.get(id)
-    investor_name = request.json['investor_name']
-    amount = request.json['amount']
-    purchase.investor_name = investor_name
-    purchase.amount = amount
-    db.session.add(purchase)
+    req_json = request.get_json()
+    for k, v in req_json.items():
+        setattr(purchase, k, v)
     db.session.commit()
     result = purchase_schema.dump(purchase).data
     return jsonify({"purchase": result})
@@ -130,9 +133,10 @@ def update_purchase(id):
 @app.route("/purchase/<loan_id>", methods=['DELETE'])
 def delete_purchase(loan_id):
     purchase = Purchase.query.get(loan_id)
+    result = purchase_schema.dump(purchase).data
     db.session.delete(purchase)
     db.session.commit()
-    return purchase_schema.jsonify(purchase)
+    return jsonify({"purchase": result})
 
 
 if __name__ == '__main__':
