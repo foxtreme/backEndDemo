@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-import os
 
+import os
+import datetime
 # Config
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -15,6 +16,8 @@ ma = Marshmallow(app)
 class Loan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     total = db.Column(db.Float, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    advance_date = db.Column(db.DateTime)
 
 
 class Purchase(db.Model):
@@ -49,7 +52,9 @@ purchases_schema = PurchaseSchema(many=True)
 @app.route("/loan", methods=["POST"])
 def add_loan():
     total = request.json['total']
-    new_loan = Loan(total=total)
+    product_id = request.json['product_id']
+    advance_date = datetime.datetime.utcnow()
+    new_loan = Loan(total=total, product_id=product_id, advance_date=advance_date)
     db.session.add(new_loan)
     db.session.commit()
     result = loan_schema.dump(new_loan).data
@@ -104,9 +109,8 @@ def add_purchase():
     return jsonify({"purchase": result})
 
 
-@app.route("/purchase", methods=["GET"])
-def get_purchase():
-    loan_id = request.json['loan_id']
+@app.route("/purchase/<loan_id>", methods=["POST"])
+def get_purchase(loan_id):
     purchases = Purchase.query.filter(Purchase.loan_id == loan_id)
     result = purchases_schema.dump(purchases).data
     return jsonify({"purchases": result})
