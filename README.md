@@ -14,6 +14,7 @@ When consulting purchases you will need to pass the loan_id field in the request
     <li>flask</li>
     <li>flask_sqlalchemy</li>
     <li>flask_marshmallow</li>
+    <li>marshmallow-sqlalchemy</li>
 </ul>
 
 type the following in your console before running it:
