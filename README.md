@@ -20,13 +20,13 @@ When consulting purchases you will need to pass the loan_id field in the request
 type the following in your console before running it:
 <pre>
 $python
->>> from backend import db
+>>> from application import db
 >>> db.create_all()
 </pre>
 
 Then run it with:
 <pre>
-$python backend.py
+$python appplication.py
 </pre>
 
 
