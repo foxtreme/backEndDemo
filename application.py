@@ -6,12 +6,15 @@ from flask_cors import CORS
 import os
 import datetime
 # Config
-app = Flask(__name__)
-CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'crud.sqlite')
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
+application = Flask(__name__)
+application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'crud.sqlite')
+application.secret_key = '5NpGrhWbVbK93DjeCpHaiyFY2ja+1OGfTPs6GkhV'   
+application.debug=True
+
+CORS(application)
+db = SQLAlchemy(application)
+ma = Marshmallow(application)
 
 
 # Models
@@ -51,7 +54,7 @@ purchases_schema = PurchaseSchema(many=True)
 
 # Endpoints
 # Loan
-@app.route("/loan", methods=["POST"])
+@application.route("/loan", methods=["POST"])
 def add_loan():
     total = request.json['total']
     product_id = request.json['product_id']
@@ -63,21 +66,21 @@ def add_loan():
     return jsonify({'loan': result})
 
 
-@app.route("/loan", methods=["GET"])
+@application.route("/loan", methods=["GET"])
 def get_loan():
     loans = Loan.query.all()
     result = loans_schema.dump(loans).data
     return jsonify({'loans': result})
 
 
-@app.route("/loan/<id>", methods=["GET"])
+@application.route("/loan/<id>", methods=["GET"])
 def detail_loan(id):
     loan = Loan.query.get(id)
     result = loan_schema.dump(loan).data
     return jsonify({'loan': result})
 
 
-@app.route("/loan/<id>", methods=["PUT"])
+@application.route("/loan/<id>", methods=["PUT"])
 def update_loan(id):
     loan = Loan.query.get(id)
     req_json = request.get_json()
@@ -88,7 +91,7 @@ def update_loan(id):
     return jsonify({"loan": result})
 
 
-@app.route("/loan/<id>", methods=['DELETE'])
+@application.route("/loan/<id>", methods=['DELETE'])
 def delete_loan(id):
     loan = Loan.query.get(id)
     db.session.delete(loan)
@@ -98,7 +101,7 @@ def delete_loan(id):
 
 
 # Purchase
-@app.route("/purchase", methods=["POST"])
+@application.route("/purchase", methods=["POST"])
 def add_purchase():
     investor_name = request.json['investor_name']
     amount = request.json['amount']
@@ -111,21 +114,21 @@ def add_purchase():
     return jsonify({"purchase": result})
 
 
-@app.route("/purchase/<loan_id>", methods=["POST"])
+@application.route("/purchase/<loan_id>", methods=["POST"])
 def get_purchase(loan_id):
     purchases = Purchase.query.filter(Purchase.loan_id == loan_id)
     result = purchases_schema.dump(purchases).data
     return jsonify({"purchases": result})
 
 
-@app.route("/purchase/<id>", methods=["GET"])
+@application.route("/purchase/<id>", methods=["GET"])
 def detail_purchase(id):
     purchase = Purchase.query.get(id)
     result = purchase_schema.dump(purchase).data
     return jsonify({"purchase": result})
 
 
-@app.route("/purchase/<id>", methods=["PUT"])
+@application.route("/purchase/<id>", methods=["PUT"])
 def update_purchase(id):
     purchase = Purchase.query.get(id)
     req_json = request.get_json()
@@ -136,7 +139,7 @@ def update_purchase(id):
     return jsonify({"purchase": result})
 
 
-@app.route("/purchase/<loan_id>", methods=['DELETE'])
+@application.route("/purchase/<loan_id>", methods=['DELETE'])
 def delete_purchase(loan_id):
     purchase = Purchase.query.get(loan_id)
     result = purchase_schema.dump(purchase).data
@@ -146,4 +149,4 @@ def delete_purchase(loan_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.run()
