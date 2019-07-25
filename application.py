@@ -10,7 +10,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 application = Flask(__name__)
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'crud.sqlite')
 application.secret_key = '5NpGrhWbVbK93DjeCpHaiyFY2ja+1OGfTPs6GkhV'   
-application.debug=True
+application.debug=False
 
 CORS(application)
 db = SQLAlchemy(application)
@@ -153,4 +153,4 @@ def delete_purchase(loan_id):
 
 
 if __name__ == '__main__':
-    application.run()
+    application.run(host= '0.0.0.0')
