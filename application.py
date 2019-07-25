@@ -53,6 +53,10 @@ purchases_schema = PurchaseSchema(many=True)
 
 
 # Endpoints
+@application.route("/")
+def index():
+    return "<h1>Hola mundo</h1>"
+
 # Loan
 @application.route("/loan", methods=["POST"])
 def add_loan():
