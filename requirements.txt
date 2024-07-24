@@ -21,7 +21,7 @@ marshmallow==2.19.5
 marshmallow-sqlalchemy==0.17.0
 pathspec==0.5.9
 python-dateutil==2.8.0
-requests==2.31.0
+requests==2.32.2
 semantic-version==2.5.0
 six==1.11.0
 SQLAlchemy==1.3.5
